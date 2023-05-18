@@ -1,5 +1,5 @@
 {
-  "name": "space-sandbox",
+  "name": "scifi-dungeon-crawler-server",
   "version": "0.0.1",
   "main": "dist/index.js",
   "type": "module",
