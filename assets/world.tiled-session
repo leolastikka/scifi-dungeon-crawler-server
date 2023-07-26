@@ -14,10 +14,10 @@
         },
         "world.json": {
             "scale": 1.5,
-            "selectedLayer": 0,
+            "selectedLayer": 1,
             "viewCenter": {
                 "x": 106.33333333333331,
-                "y": 209
+                "y": 125
             }
         }
     },

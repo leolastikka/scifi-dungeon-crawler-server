@@ -1,3 +1,7 @@
+import { Chunk } from "./Chunk.js";
+import { Clock } from "./Clock.js";
+import { Connection } from "./Connection.js";
+import { Entity } from "./Entity.js";
 import { Vector2 } from "./Math.js";
 
 export interface LoginData {
@@ -13,18 +17,27 @@ export interface User {
   data?: any;
 }
 
-export interface Entity {
-  uuid?: string;
-  spawnerId?: number;
-  networkId?: number;
-  position: Vector2;
-  class: string;
-  chunk: Chunk;
+export enum EntityState {
+  Idle,
+  Move,
+  Turn
 }
 
-export interface Chunk {
-  pos: Vector2;
-  size: number;
-  tiles: Array<Array<number>>;
-  entities: Array<Entity>;
+export interface Action {
+  type: string;
+  /** Owning entity networkId. */
+  networkId: number;
+  direction?: string;
+  targetId?: number;
+  endTime?: number;
+  startPosition?: Vector2;
+  endPosition?: Vector2;
+  startOrientation?: number;
+  endOrientation?: number;
+  speed?: number;
+}
+
+export interface UpdateData {
+  clock: Clock;
+  entities: Map<number, Entity>;
 }
