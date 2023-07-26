@@ -1,6 +1,4 @@
-import { Chunk } from "./Chunk.js";
 import { Clock } from "./Clock.js";
-import { Connection } from "./Connection.js";
 import { Entity } from "./Entity.js";
 import { Vector2 } from "./Math.js";
 

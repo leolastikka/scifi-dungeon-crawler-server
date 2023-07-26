@@ -1,5 +1,6 @@
-import { Action, Entity } from "./Interfaces";
-import { Vector2 } from "./Math";
+import { Entity } from "./Entity.js";
+import { Action } from "./Interfaces.js";
+import { Vector2 } from "./Math.js";
 
 export class Chunk extends EventTarget {
   public position: Vector2;

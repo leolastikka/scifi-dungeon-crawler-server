@@ -1,7 +1,8 @@
 import WebSocket from "ws";
-import { Action, Entity, User } from "./Interfaces";
-import { Server } from "./Server";
-import { Chunk } from "./Chunk";
+import { Action, User } from "./Interfaces.js";
+import { Server } from "./Server.js";
+import { Chunk } from "./Chunk.js";
+import { Entity } from "./Entity.js";
 
 export class Connection {
   private socket: WebSocket.WebSocket;

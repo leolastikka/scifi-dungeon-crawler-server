@@ -1,8 +1,8 @@
-import { Chunk } from "./Chunk";
-import { Connection } from "./Connection";
-import { Action, UpdateData } from "./Interfaces";
-import { Vector2 } from "./Math";
-import { World } from "./World";
+import { Chunk } from "./Chunk.js";
+import { Connection } from "./Connection.js";
+import { Action, UpdateData } from "./Interfaces.js";
+import { Vector2 } from "./Math.js";
+import { World } from "./World.js";
 
 /** Units per second. */
 const ENTITY_MOVE_SPEED = 2.0;
