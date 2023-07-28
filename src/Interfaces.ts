@@ -11,7 +11,7 @@ export interface User {
   id: number;
   username: string;
   password?: string;
-  entityUuid?: string;
+  entityId?: number;
   data?: any;
 }
 

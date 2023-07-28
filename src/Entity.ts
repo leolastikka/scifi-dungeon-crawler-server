@@ -27,8 +27,6 @@ export class Entity {
   public action: Action;
   public chunk: Chunk;
 
-  /** Unique identifier for connecting entity with user. */
-  public uuid: string;
   public spawnerId: number;
   public class: string; // extend Entity to make subclasses for these?
   /** Owner connection if this is player entity. */
@@ -77,16 +75,22 @@ export class Entity {
   }
 
   private updateTurn(updateData: UpdateData): void {
-    const turnAngle = this.action.speed * updateData.clock.deltaTime;
-    const rotation = this.action.endOrientation - this.orientation;
+    let updateRotation = this.action.speed * updateData.clock.deltaTime;
+    const diff = this.action.endOrientation - this.orientation;
+    if (diff < 0.0) {
+      updateRotation *= -1.0;
+    }
     
-    if (turnAngle < rotation) {
+    if (updateRotation < Math.abs(diff)) { // FIX THIS
       // if end orientation is not reached
-      this.orientation += turnAngle;
+      this.orientation += updateRotation;
     }
     else {
       // if end orientation is reached
       this.orientation = this.action.endOrientation;
+      if (this.orientation >= 2 * Math.PI) {
+        this.orientation -= Math.PI;
+      }
       this.endAction();
     }
   }
@@ -98,6 +102,7 @@ export class Entity {
   public startAction(action: Action): boolean {
     // For now previous actions can't be overwritten.
     if (this.action) {
+      console.log('Entity.startAction(): new action not started: ' + action.type);
       return false;
     }
 
@@ -112,11 +117,12 @@ export class Entity {
         movement = forward.clone().multiplyScalar(-1);
       }
       else if (action.direction === 'left') {
-        movement = forward.clone().rotateAngle(Math.PI / 2);
+        movement = forward.clone().rotateAngle(-Math.PI / 2.0);
       }
       else if (action.direction === 'right') {
-        movement = forward.clone().rotateAngle(-Math.PI / 2);
+        movement = forward.clone().rotateAngle(Math.PI / 2.0);
       }
+      const distance = movement.length();
 
       action.startPosition = this.position.clone();
       action.endPosition = this.position.clone().add(movement);
@@ -141,15 +147,18 @@ export class Entity {
       this.state = EntityState.Turn;
     }
     else {
+      console.log('Entity.startAction(): invalid action type: ' + action.type);
       return false;
     }
 
+    console.log('Entity.startAction(): new action started: ' + action.type);
     // Send action to everyone listening to entity's chunk.
     this.chunk.broadcastAction(action);
     return true;
   }
 
   private endAction(): void {
+    console.log('Entity.endAction(): type: ' + this.action.type);
     if (this.action.type === 'move') {
       // If entity is a player entity.
       if (this.connection) {
@@ -158,11 +167,15 @@ export class Entity {
       }
     }
 
-    // remove action and reset state
+    // Remove action and reset state.
     this.action = null;
     this.state = EntityState.Idle;
   }
 
+  /** 
+   * Called automatically by JSON.stringify().
+   * @returns Serialized entity instance for sending to network.
+   */
   public toJSON(): any {
     return {
       networkId: this.networkId,
@@ -171,6 +184,9 @@ export class Entity {
     };
   }
 
+  /**
+   * Sets all internal object references to null.
+   */
   public destructor(): void {
     this.position = null;
     this.action = null;

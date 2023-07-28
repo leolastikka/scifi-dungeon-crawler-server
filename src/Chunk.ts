@@ -19,6 +19,7 @@ export class Chunk extends EventTarget {
     this.position = position;
     this.size = size;
     this.tiles = tiles;
+    this.entities = new Map();
   }
 
   public broadcastAction(action: Action) {
@@ -30,7 +31,8 @@ export class Chunk extends EventTarget {
   public toJSON(): any {
     return {
       position: this.position,
-      tiles: this.tiles
+      tiles: this.tiles,
+      size: this.size
     };
   }
 }

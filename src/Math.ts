@@ -40,8 +40,12 @@ export class Vector2 {
   }
 
   public rotateAngle(radians: number): Vector2 {
-    this.x = Math.cos(radians) * this.x - Math.sin(radians) * this.y;
-    this.y = Math.sin(radians) * this.x + Math.cos(radians) * this.y;
+    const cosValue = Math.cos(radians);
+    const sinValue = Math.sin(radians);
+    const x = this.x;
+    const y = this.y;
+    this.x = cosValue * x - sinValue * y;
+    this.y = sinValue * x + cosValue * y;
     return this;
   }
 
@@ -57,6 +61,7 @@ export class Vector2 {
    * @returns New instance of Vector2.
    */
   public static fromAngle(radians: number): Vector2 {
+    // radians = 2 * Math.PI - radians;
     return new Vector2(Math.cos(radians), Math.sin(radians));
   }
 }

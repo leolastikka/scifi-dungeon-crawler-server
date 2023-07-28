@@ -1,5 +1,5 @@
 import WebSocket from "ws";
-import { Action, User } from "./Interfaces.js";
+import { Action, UpdateData, User } from "./Interfaces.js";
 import { Database } from "./Database.js";
 import { World } from "./World.js";
 import { Connection } from "./Connection.js";
@@ -38,30 +38,32 @@ export class Server {
       if (!action) {
         break;
       }
+      console.log('Server.update(): connection.actionBuffer has action:');
+      console.log(action);
 
       // Start new action if no previous action.
       const entity = this.world.getEntityByNetworkId(action.networkId);
       if (entity.startAction(action)) {
         connection.actionBuffer = null;
       }
-    };
+    }
 
     // Update world. New actions are sent to client inside world.
     this.world.update();
   }
 
   public onWebsocketConnection(socket: WebSocket.WebSocket): void {
-    console.log('server.onWebsocketConnection websocket unauthenticated');
+    console.log('Server.onWebsocketConnection(): unauthenticated');
     const connection = new Connection(socket, this);
     this.connections.push(connection);
   }
 
   /** Called by connection after user is authenticated. */
   public startConnection(connection: Connection): void {
-    console.log('Server.startConnection');
+    console.log('Server.startConnection()');
 
     // Set owner player entity to connection.
-    connection.entity = this.world.getEntityByUuid(connection.user.entityUuid);
+    connection.entity = this.world.getEntityByNetworkId(connection.user.entityId);
 
     // Send chunks and entities to client.
     this.world.updateWatchedChunks(connection);
@@ -84,6 +86,7 @@ export class Server {
     for (let chunk of connection.watchedChunks) {
       chunk.removeEventListener('action', connection.onChunkAction);
     }
+    connection.watchedChunks = [];
 
     // remove connection
     this.connections = this.connections.filter(c => c !== connection);
@@ -96,18 +99,21 @@ export class Server {
       return null;
     }
 
-    if (!user.entityUuid) {
-      user.entityUuid = this.world.createNewUserEntity();
+    if (!user.entityId) {
+      user.entityId = this.world.createNewUserEntity();
+      console.log('Server.authenticate(): creating new entity: ' + user.entityId);
       user.data = {
         skills: {},
         items: {},
         state: {}
       };
-      await this.database.updateUser(user.id, {
-        entityUuid: user.entityUuid,
-        data: user.data
-      });
+      // Don't save entity id to user as new entity is created on every login.
+      // await this.database.updateUser(user.id, {
+      //   entityUuid: user.entityId,
+      //   data: user.data
+      // });
     }
+    else { console.log('FOUND USER WITH UUID: ' + user.entityId) }
 
     return user;
   }

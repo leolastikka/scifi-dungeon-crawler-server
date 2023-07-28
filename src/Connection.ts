@@ -35,6 +35,7 @@ export class Connection {
   }
 
   public send(data: string): void {
+    console.log('Connection.send(): ' + data)
     this.socket.send(data);
   }
 
@@ -51,8 +52,7 @@ export class Connection {
   }
 
   private onMessage(event: WebSocket.MessageEvent): void {
-    console.log('connection.onMessage');
-    this.socket.send(event.data); // echo data
+    console.log('Connection.onMessage(): ' + event.data);
 
     // Create input buffer for every connection/client?
     // At the beinning of each frame, server reads all client buffers.
@@ -65,6 +65,7 @@ export class Connection {
     let data: any;
     try {
       data = JSON.parse(event.data.toString());
+      console.log(data);
 
       const action: Action = {
         type: data.type,
@@ -75,8 +76,9 @@ export class Connection {
       case 'move':
       case 'turn':
         action.direction = data.direction;
+        break;
       default:
-        console.log('connection.onMessage invalid type');
+        console.log('Connection.onMessage invalid type');
         this.socket.close();
         break;
       }
@@ -89,7 +91,10 @@ export class Connection {
   }
 
   public onChunkAction(event: MessageEvent): void {
-    throw new Error('NOT IMPLEMENTED');
+    this.send(JSON.stringify({
+      type: 'addAction',
+      action: event.data
+    }));
   }
 
   private validateMoveAction(data: any): boolean {
@@ -101,6 +106,7 @@ export class Connection {
   }
 
   private onClose(event: WebSocket.CloseEvent): void {
+    console.log('Connection.onClose()')
     if (!this.user) {
       return;
     }
@@ -115,6 +121,7 @@ export class Connection {
   }
 
   public destructor(): void {
+    console.log('Connection.destructor()');
     this.socket = null;
     this.server = null;
     this.user = null;

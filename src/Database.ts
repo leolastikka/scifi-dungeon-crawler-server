@@ -70,8 +70,8 @@ export class Database {
   }
 
   public async updateUser(id: number, properties: any) {
-    const user = this.localUsers.find(u => u.id === id);
-    Object.assign(user, properties);
+    let user = this.localUsers.find(u => u.id === id);
+    user = Object.assign(user, properties);
   }
 
   private async createNewUser(username: string,

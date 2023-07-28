@@ -1,4 +1,3 @@
-import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
 import url from 'url';
@@ -64,14 +63,14 @@ export class World {
     this.clock = new Clock();
   }
 
-  public getEntityByUuid(uuid: string): Entity {
-    for (let value of this.entities.values()) {
-      if (value.uuid === uuid) {
-        return value;
-      }
-    }
-    return null;
-  }
+  // public getEntityByUuid(uuid: string): Entity {
+  //   for (let value of this.entities.values()) {
+  //     if (value.uuid === uuid) {
+  //       return value;
+  //     }
+  //   }
+  //   return null;
+  // }
 
   public getEntityByNetworkId(networkId: number): Entity {
     return this.entities.get(networkId);
@@ -145,6 +144,9 @@ export class World {
         connection.expiringChunks.delete(key);
       }
     }
+
+    // Add new chunks to connections list.
+    connection.watchedChunks = connection.watchedChunks.concat(chunksToAdd);
 
     // Send addChunks message.
     connection.send(JSON.stringify({
@@ -225,7 +227,7 @@ export class World {
     }
   }
 
-  public createNewUserEntity(): string {
+  public createNewUserEntity(): number {
     const startPosition: Vector2 = new Vector2(4, 1);
     const startOrientation: number = Math.PI;
 
@@ -237,14 +239,13 @@ export class World {
       startOrientation,
       this
     );
-    entity.uuid = crypto.randomUUID();
     entity.class = 'player'
     entity.chunk = chunk;
 
     this.entities.set(entity.networkId, entity);
     chunk.entities.set(entity.networkId, entity);
 
-    return entity.uuid;
+    return entity.networkId;
   }
 
   public markEntityRemoved(entity: Entity): void {
