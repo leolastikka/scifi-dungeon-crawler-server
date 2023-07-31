@@ -88,8 +88,12 @@ export class Entity {
     else {
       // if end orientation is reached
       this.orientation = this.action.endOrientation;
+      // Keep orientation value between 0.0 and 2*PI.
       if (this.orientation >= 2 * Math.PI) {
-        this.orientation -= Math.PI;
+        this.orientation -= 2 * Math.PI;
+      }
+      else if (this.orientation < 0.0) {
+        this.orientation += 2 * Math.PI;
       }
       this.endAction();
     }
