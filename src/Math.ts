@@ -61,7 +61,7 @@ export class Vector2 {
    * @returns New instance of Vector2.
    */
   public static fromAngle(radians: number): Vector2 {
-    // radians = 2 * Math.PI - radians;
-    return new Vector2(Math.cos(radians), Math.sin(radians));
+    radians += Math.PI;
+    return new Vector2(Math.sin(radians), Math.cos(radians));
   }
 }
